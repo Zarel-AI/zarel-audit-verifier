@@ -1,0 +1,23 @@
+// Typechecks this package's TEST files, which `tsconfig.json` excludes.
+//
+// Why a second config rather than widening the first: `jest.config.cjs` uses
+// `ts-jest` under `isolatedModules`, which TRANSPILES and never checks, so a
+// package whose `tsconfig.json` excludes its tests has them checked by no tool,
+// and a test double that has drifted from the shape production reads is
+// invisible BY CONSTRUCTION. The repository's type-check runs this config.
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        // Widen from `./src` so `tests/` is inside the project root.
+        "rootDir": ".",
+        "types": ["jest", "node"]
+    },
+    "include": [
+        "src/**/*",
+        "tests/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

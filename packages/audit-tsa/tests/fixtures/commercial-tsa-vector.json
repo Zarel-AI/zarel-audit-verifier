@@ -1,0 +1,7 @@
+{
+  "_doc": "Commercial-TSA gate — a REAL token from the chosen commercial/qualified RFC 3161 TSA. Capture procedure: submit a fixed 32-byte SHA-256 digest with certReq=true; store the DER token (base64), the digest (base64url) you submitted, and the TSA's PINNED root cert (PEM). Then flip status to 'captured'. Until then this gate is a visible skip, NOT silently green.",
+  "status": "pending",
+  "expected_root_b64": "",
+  "token_b64": "",
+  "pinned_root_pem": ""
+}

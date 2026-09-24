@@ -1,0 +1,88 @@
+{
+    "name": "@zarel-ai/audit-tsa",
+    "version": "1.0.1",
+    "description": "Offline RFC 3161 timestamp-token verifier + Merkle inclusion proofs for Zarel external audit anchoring. Pins TSA roots; never touches the OS trust store.",
+    "license": "Apache-2.0",
+    "author": {
+        "name": "Nicolas Moreno",
+        "url": "https://zarel.ai"
+    },
+    "homepage": "https://zarel.ai",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Zarel-AI/zarel-audit-verifier.git",
+        "directory": "packages/audit-tsa"
+    },
+    "keywords": [
+        "rfc3161",
+        "timestamp",
+        "tsa",
+        "trusted-timestamping",
+        "cms",
+        "asn1",
+        "merkle",
+        "audit",
+        "verification",
+        "compliance",
+        "zarel"
+    ],
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.mts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "sideEffects": false,
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "prepack": "npm run build",
+        "build": "tsc --noEmit && tsup",
+        "typecheck": "tsc --noEmit",
+        "test": "jest"
+    },
+    "tsup": {
+        "entry": [
+            "src/index.ts"
+        ],
+        "format": [
+            "cjs",
+            "esm"
+        ],
+        "dts": true,
+        "sourcemap": true,
+        "clean": true,
+        "treeshake": true
+    },
+    "dependencies": {
+        "asn1js": "^3.0.6",
+        "pkijs": "^3.4.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/node": "^20.19.31",
+        "jest": "^30.2.0",
+        "ts-jest": "^29.4.6",
+        "tsup": "8.5.1",
+        "typescript": "^5.9.3"
+    }
+}

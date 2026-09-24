@@ -1,0 +1,84 @@
+{
+    "name": "@zarel-ai/audit-chain",
+    "version": "1.0.1",
+    "description": "Offline verifier for Zarel audit tamper-evidence: canonical JSON, per-(tenant,log) hash chain, and a pure node:crypto chain verifier. Zero runtime dependencies.",
+    "license": "Apache-2.0",
+    "author": {
+        "name": "Nicolas Moreno",
+        "url": "https://zarel.ai"
+    },
+    "homepage": "https://zarel.ai",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Zarel-AI/zarel-audit-verifier.git",
+        "directory": "packages/audit-chain"
+    },
+    "keywords": [
+        "audit",
+        "tamper-evidence",
+        "hash-chain",
+        "canonical-json",
+        "merkle",
+        "ed25519",
+        "verification",
+        "compliance",
+        "zarel"
+    ],
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.mts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "sideEffects": false,
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "prepack": "npm run build",
+        "build": "tsc --noEmit && tsup",
+        "typecheck": "tsc --noEmit",
+        "test": "jest"
+    },
+    "tsup": {
+        "entry": [
+            "src/index.ts"
+        ],
+        "format": [
+            "cjs",
+            "esm"
+        ],
+        "dts": true,
+        "sourcemap": true,
+        "clean": true,
+        "treeshake": true
+    },
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/libsodium-wrappers": "^0.7.14",
+        "@types/node": "^20.19.31",
+        "jest": "^30.2.0",
+        "libsodium-wrappers": "^0.7.13",
+        "ts-jest": "^29.4.9",
+        "tsup": "8.5.1",
+        "typescript": "^5.9.3"
+    }
+}
