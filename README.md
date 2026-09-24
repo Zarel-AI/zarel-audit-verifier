@@ -30,3 +30,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Every commit needs a `Signed-off-by:` li
 ## License
 
 Apache-2.0 © 2026 Nicolas Moreno. See [LICENSE](LICENSE).
+
