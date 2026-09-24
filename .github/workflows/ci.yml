@@ -1,9 +1,15 @@
-# Tests every package on each pull request and push, and publishes from `main`.
+# Tests every package on each pull request and push, and stages a release from `main`.
 #
-# Publishing is idempotent: a package is published only when the version in its package.json is
-# not on npm yet, and each publish is tagged `<package>-v<version>`. npm authenticates this
-# workflow through trusted publishing (OIDC), so the repository holds no npm token, and every
-# publish carries a provenance attestation that links the tarball to this repository and commit.
+# A package is staged only when the version in its package.json is not on npm yet, and each staged
+# version is tagged `<package>-v<version>`. A version already staged and still awaiting approval is
+# not visible to `npm view`, and this workflow's OIDC token cannot run `npm stage list`, so npm's
+# refusal to stage it twice is read as "already staged" and the step goes on. npm authenticates this workflow through trusted
+# publishing (OIDC), so the repository holds no npm token, and every tarball carries a provenance
+# attestation that links it to this repository and commit.
+#
+# This workflow can only STAGE. A staged version is not installable until a maintainer approves it
+# on npmjs.com with two-factor authentication, so a compromised repository or workflow cannot put
+# a version of a verifier in front of its users on its own.
 
 name: CI
 
@@ -51,9 +57,9 @@ jobs:
               with:
                   node-version: 24
                   registry-url: https://registry.npmjs.org
-            - name: Use an npm that supports trusted publishing (11.5.1 or later)
-              run: npm install -g npm@^11.5.1
-            - name: Publish each package whose version is not on npm yet
+            - name: Use an npm that can stage a publish (11.15.0 or later)
+              run: npm install -g npm@^11.15.0
+            - name: Stage each package whose version is not on npm yet
               run: |
                   set -euo pipefail
                   for dir in packages/*/; do
@@ -63,8 +69,25 @@ jobs:
                           echo "${name}@${version} is already on npm"
                           continue
                       fi
-                      (cd "$dir" && npm install --no-audit --no-fund && npm publish --provenance --access public)
+                      (cd "$dir" && npm install --no-audit --no-fund)
+                      if out=$(cd "$dir" && npm stage publish --provenance --access public 2>&1); then
+                          echo "$out"
+                          echo "${name}@${version} is staged; approve it on npmjs.com to publish it"
+                      elif grep -qiE 'E409|already (been )?staged|conflict' <<<"$out"; then
+                          echo "$out"
+                          echo "${name}@${version} is already staged and awaiting approval on npmjs.com"
+                      else
+                          echo "$out"
+                          exit 1
+                      fi
                       tag="${name#@zarel-ai/}-v${version}"
-                      git tag "$tag"
-                      git push origin "$tag"
+                      if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null; then
+                          echo "tag ${tag} already exists"
+                      else
+                          status=$?
+                          # 2 is ls-remote's "no such ref"; anything else is a remote that could not answer.
+                          [ "$status" -eq 2 ] || exit "$status"
+                          git tag "$tag"
+                          git push origin "$tag"
+                      fi
                   done
