@@ -21,7 +21,7 @@ Signed-off-by: Your Name <you@example.com>
 
 By adding it, you certify the [Developer Certificate of Origin 1.1](DCO) for that commit. In
 short, you wrote the change or have the right to submit it, you submit it under this
-repository's license ([Apache-2.0](LICENSE)), and you understand that the contribution and its
+repository's license (see [LICENSE](LICENSE)), and you understand that the contribution and its
 sign-off are public and kept permanently. Read the [full text](DCO) before your first sign-off.
 
 If you forgot to sign off, fix the commits and force-push the branch:

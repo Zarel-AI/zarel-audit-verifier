@@ -1,4 +1,4 @@
-# Tests every package on each pull request and push, and stages a release from `main`.
+# Tests every package under packages/ on each pull request and push, and stages a release from `main`.
 #
 # A package is staged only when the version in its package.json is not on npm yet, and each staged
 # version is tagged `<package>-v<version>`. A version already staged and still awaiting approval is
@@ -22,13 +22,24 @@ permissions:
     contents: read
 
 jobs:
+    packages:
+        name: List the packages
+        runs-on: ubuntu-latest
+        outputs:
+            list: ${{ steps.list.outputs.list }}
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - id: list
+              run: echo "list=$(ls -d packages/*/ | xargs -n1 basename | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
+
     test:
         name: ${{ matrix.package }} on Node ${{ matrix.node }}
+        needs: packages
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
             matrix:
-                package: [audit-chain, audit-tsa]
+                package: ${{ fromJSON(needs.packages.outputs.list) }}
                 node: [18, 20, 22]
         defaults:
             run:
@@ -73,7 +84,7 @@ jobs:
                       if out=$(cd "$dir" && npm stage publish --provenance --access public 2>&1); then
                           echo "$out"
                           echo "${name}@${version} is staged; approve it on npmjs.com to publish it"
-                      elif grep -qiE 'E409|already (been )?staged|conflict' <<<"$out"; then
+                      elif grep -qE 'code E409' <<<"$out"; then
                           echo "$out"
                           echo "${name}@${version} is already staged and awaiting approval on npmjs.com"
                       else

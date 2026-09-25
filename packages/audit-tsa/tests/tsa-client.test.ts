@@ -43,8 +43,8 @@ async function startServer(handler: Handler): Promise<TestServer> {
         url: `http://127.0.0.1:${port}/tsa`,
         close: () => new Promise<void>((resolve) => {
             server.close(() => resolve());
-            // Node 18 keeps the client's keep-alive socket open until it times out, which holds
-            // `close` for seconds. Node 19+ closes idle connections on `close` by itself.
+            // `close` waits for open connections, and on Node 18.20 (measured) the client's
+            // keep-alive socket stays open until it times out, holding `close` for seconds.
             server.closeAllConnections();
         }),
     };
